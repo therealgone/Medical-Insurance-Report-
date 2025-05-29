@@ -2,6 +2,7 @@
 
 ## Overview
 This system is designed to analyze medical reports and scans for insurance claim processing. It uses OCR, AI-powered image analysis, and natural language processing to extract and analyze medical information from documents and scans.
+![Website UI](UI1.png)
 
 ## System Components
 
