@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Insurance AI Assistant</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --background-color: #f8f9fa;
+            --text-color: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background-color: var(--primary-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            color: white !important;
+            font-weight: 600;
+        }
+
+        .main-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            background: white;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 1.5rem;
+        }
+
+        .form-control {
+            border-radius: 10px;
+            padding: 0.8rem;
+            border: 1px solid #dee2e6;
+        }
+
+        .form-control:focus {
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+
+        .btn-primary {
+            background-color: var(--secondary-color);
+            border: none;
+            border-radius: 10px;
+            padding: 0.8rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .custom-file-upload {
+            border: 2px dashed #dee2e6;
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .custom-file-upload:hover {
+            border-color: var(--secondary-color);
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+
+        .custom-file-upload.dragover {
+            border-color: var(--secondary-color);
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+
+        .form-check-input:checked {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .loading-spinner {
+            width: 3rem;
+            height: 3rem;
+        }
+
+        .error-message {
+            background-color: #fee;
+            color: #c00;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .file-info {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .file-info i {
+            color: var(--secondary-color);
+        }
+
+        .form-switch {
+            padding-left: 2.5rem;
+        }
+
+        .form-switch .form-check-input {
+            width: 2.5rem;
+            height: 1.25rem;
+            margin-left: -2.5rem;
+        }
+
+        .form-switch .form-check-input:checked {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+
+        .form-switch .form-check-input:focus {
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-text {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-heartbeat me-2"></i>
+                Medical Insurance AI Assistant
+            </a>
+        </div>
+    </nav>
+
+    <div class="container main-container">
+        <div class="error-message" id="errorMessage"></div>
+
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="fas fa-upload me-2"></i>Upload Medical Report</h4>
+            </div>
+            <div class="card-body">
+                <form id="uploadForm" action="/analyze" method="post" enctype="multipart/form-data">
+                    <div class="mb-4">
+                        <label class="form-label">Upload Medical Report (PDF)</label>
+                        <div class="custom-file-upload" id="reportDropZone">
+                            <i class="fas fa-file-pdf fa-3x mb-3 text-secondary"></i>
+                            <p class="mb-2">Drag and drop your PDF report here or click to browse</p>
+                            <p class="form-text">Supported format: PDF</p>
+                            <input type="file" class="form-control" id="file" name="file" accept=".pdf">
+                        </div>
+                        <div class="file-info" id="reportFileInfo">
+                            <i class="fas fa-file-pdf me-2"></i>
+                            <span id="reportFileName"></span>
+                            <span class="text-muted ms-2" id="reportFileSize"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Upload Medical Scan (Image)</label>
+                        <div class="custom-file-upload" id="scanDropZone">
+                            <i class="fas fa-x-ray fa-3x mb-3 text-secondary"></i>
+                            <p class="mb-2">Drag and drop your scan image here or click to browse</p>
+                            <p class="form-text">Supported formats: JPG, PNG</p>
+                            <input type="file" class="form-control" id="scan" name="scan" accept=".jpg,.jpeg,.png">
+                        </div>
+                        <div class="file-info" id="scanFileInfo">
+                            <i class="fas fa-x-ray me-2"></i>
+                            <span id="scanFileName"></span>
+                            <span class="text-muted ms-2" id="scanFileSize"></span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search me-2"></i>Analyze
+                    </button>
+                </form>
+
+                <div class="loading">
+                    <div class="spinner-border loading-spinner text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Analyzing your documents...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Handle form submission
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+            const reportInput = document.getElementById('file');
+            const scanInput = document.getElementById('scan');
+            
+            if (!reportInput.files.length && !scanInput.files.length) {
+                e.preventDefault();
+                showError('Please upload at least one file (report or scan)');
+                return;
+            }
+            document.querySelector('.loading').style.display = 'block';
+        });
+
+        // Handle report file selection
+        document.getElementById('file').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const fileInfo = document.getElementById('reportFileInfo');
+                const fileName = document.getElementById('reportFileName');
+                const fileSize = document.getElementById('reportFileSize');
+                
+                fileName.textContent = file.name;
+                fileSize.textContent = formatFileSize(file.size);
+                fileInfo.style.display = 'block';
+            }
+        });
+
+        // Handle scan file selection
+        document.getElementById('scan').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const fileInfo = document.getElementById('scanFileInfo');
+                const fileName = document.getElementById('scanFileName');
+                const fileSize = document.getElementById('scanFileSize');
+                
+                fileName.textContent = file.name;
+                fileSize.textContent = formatFileSize(file.size);
+                fileInfo.style.display = 'block';
+            }
+        });
+
+        // Drag and drop functionality for report
+        const reportDropZone = document.getElementById('reportDropZone');
+        const reportInput = document.getElementById('file');
+
+        reportDropZone.addEventListener('click', () => reportInput.click());
+
+        reportDropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            reportDropZone.classList.add('dragover');
+        });
+
+        reportDropZone.addEventListener('dragleave', () => {
+            reportDropZone.classList.remove('dragover');
+        });
+
+        reportDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            reportDropZone.classList.remove('dragover');
+            reportInput.files = e.dataTransfer.files;
+            
+            // Trigger change event to update file info
+            const event = new Event('change');
+            reportInput.dispatchEvent(event);
+        });
+
+        // Drag and drop functionality for scan
+        const scanDropZone = document.getElementById('scanDropZone');
+        const scanInput = document.getElementById('scan');
+
+        scanDropZone.addEventListener('click', () => scanInput.click());
+
+        scanDropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            scanDropZone.classList.add('dragover');
+        });
+
+        scanDropZone.addEventListener('dragleave', () => {
+            scanDropZone.classList.remove('dragover');
+        });
+
+        scanDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            scanDropZone.classList.remove('dragover');
+            scanInput.files = e.dataTransfer.files;
+            
+            // Trigger change event to update file info
+            const event = new Event('change');
+            scanInput.dispatchEvent(event);
+        });
+
+        // Helper functions
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function showError(message) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            setTimeout(() => {
+                errorMessage.style.display = 'none';
+            }, 5000);
+        }
+
+        // Handle errors from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const error = urlParams.get('error');
+        if (error) {
+            showError(decodeURIComponent(error));
+        }
+    </script>
+</body>
+</html> 
