@@ -23,6 +23,8 @@ This system is designed to analyze medical reports and scans for insurance claim
   - Extracts text using Tesseract OCR
   - Handles multi-page documents
 
+
+
 - **Image Processing**
   - Supports PNG, JPG, JPEG formats
   - Performs OCR on images
@@ -34,7 +36,7 @@ This system is designed to analyze medical reports and scans for insurance claim
   - Implements rate limiting (2-second delay between calls)
   - Includes text summarization for long documents
   - Provides structured analysis in predefined sections
-
+![PDFUI](UI2.png)
 - **BiomedCLIP Analysis**
   - Identifies medical scan types
   - Provides confidence scores
@@ -46,7 +48,7 @@ This system is designed to analyze medical reports and scans for insurance claim
   - Includes all analysis sections
   - Maintains consistent formatting
   - Adds timestamps and watermarks
-
+![PDFUI](UI3.png)
 ## API Endpoints
 
 ### 1. Main Routes
